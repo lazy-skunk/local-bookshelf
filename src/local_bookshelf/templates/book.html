@@ -1,0 +1,41 @@
+{% extends "base.html" %} {% block title %}{{ book.title }} | ローカル本棚{%
+endblock %} {% block content %}
+<section class="grid min-w-0 gap-4 rounded bg-(--color-foreground)/3 p-4">
+  <h2 class="font-semibold">{{ book.title }}</h2>
+  <dl class="grid gap-4">
+    {% for key, label in [('isbn', 'ISBN'), ('author', '著者'), ('publisher',
+    '出版社'), ('publicationDate', '出版年月'), ('subjects', '主題'),
+    ('description', '要約'), ('tableOfContents', '目次')] %} {% if book[key] %}
+    <div class="grid gap-2">
+      <dt class="font-semibold">{{ label }}</dt>
+      <dd>{{ book[key] }}</dd>
+    </div>
+    {% endif %} {% endfor %}
+  </dl>
+  {% if book.url %}
+  <p>
+    <a
+      class="text-blue-500 visited:text-purple-500 hover:underline motion-safe:transition-colors"
+      href="{{ book.url }}"
+      >公式書誌</a
+    >
+  </p>
+  {% endif %}
+  <details>
+    <summary class="cursor-pointer">取得した書誌 XML</summary>
+    <pre
+      class="mt-2 rounded bg-(--color-foreground)/3 p-2 wrap-anywhere whitespace-pre-wrap motion-safe:transition-opacity motion-safe:starting:opacity-0"
+    >
+{{ book.sourceXml }}</pre
+    >
+  </details>
+  <form method="post" action="{{ url_for('books.remove', isbn=book.isbn) }}">
+    <button
+      type="submit"
+      class="cursor-pointer rounded bg-red-100 px-4 py-2 text-red-900 motion-safe:transition motion-safe:active:translate-y-px dark:bg-red-900 dark:text-red-100"
+    >
+      この書籍を削除
+    </button>
+  </form>
+</section>
+{% endblock %}
