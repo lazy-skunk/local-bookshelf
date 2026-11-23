@@ -1,0 +1,80 @@
+{% extends "base.html" %} {% block content %} {% if error %}
+<p role="alert" class="text-red-500">{{ error }}</p>
+{% endif %}
+<section class="grid gap-4 rounded bg-(--color-foreground)/3 p-4">
+  <h2 class="font-semibold">書籍を登録</h2>
+  <form class="grid gap-2" method="post" action="{{ url_for('books.register_isbn') }}">
+    <label for="isbn">ISBN</label>
+    <div class="flex flex-wrap gap-2">
+      <input
+        id="isbn"
+        name="isbn"
+        value="{{ isbn_input }}"
+        required
+        class="min-w-0 flex-1 rounded bg-(--color-foreground)/3 p-2 hover:bg-(--color-foreground)/6 motion-safe:transition-colors"
+      />
+      <button class="cursor-pointer rounded bg-green-100 px-4 py-2 text-green-900 motion-safe:transition motion-safe:active:translate-y-px dark:bg-green-900 dark:text-green-100">登録</button>
+    </div>
+  </form>
+</section>
+
+<section class="grid min-w-0 gap-4 rounded bg-(--color-foreground)/3 p-4">
+  <h2 class="font-semibold">書籍一覧</h2>
+  <form id="book-search" class="grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)]" method="get" action="{{ url_for('books.index') }}">
+    <div class="grid gap-2">
+      <label for="search-mode">検索方式</label>
+      <select id="search-mode" name="search_mode" class="rounded bg-(--color-foreground)/3 p-2 hover:bg-(--color-foreground)/6 motion-safe:transition-colors">
+        <option value="keyword" class="bg-(--color-background)">語句検索</option>
+        <option
+          value="semantic"
+          class="bg-(--color-background)"
+          {% if search_mode == 'semantic' %}selected{% endif %}
+        >
+          意味検索
+        </option>
+      </select>
+    </div>
+    <div class="grid gap-2">
+      <label for="query">検索語</label>
+      <input id="query" name="query" type="search" value="{{ query }}" class="min-w-0 rounded bg-(--color-foreground)/3 p-2 hover:bg-(--color-foreground)/6 motion-safe:transition-colors" />
+    </div>
+  </form>
+  <p id="search-status" role="status" class="text-(--color-foreground)/50 motion-safe:transition-opacity motion-safe:starting:opacity-0" hidden></p>
+  <div id="search-results" class="grid gap-2" aria-live="polite">
+    {% if search_error %}
+    <p role="alert" class="text-red-500 motion-safe:transition-opacity motion-safe:starting:opacity-0">{{ search_error }}</p>
+    {% endif %}
+    {% if books %}
+    <div class="overflow-x-auto rounded motion-safe:transition-opacity motion-safe:starting:opacity-0">
+      <table class="w-full bg-(--color-foreground)/3 text-left">
+        <thead class="bg-(--color-foreground)/3">
+          <tr>
+            <th scope="col" class="p-2 font-semibold">書名</th>
+            <th scope="col" class="p-2 font-semibold whitespace-nowrap">出版年</th>
+            {% if similarity_by_isbn %}
+            <th scope="col" class="p-2 font-semibold whitespace-nowrap">類似度</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for book in books %}
+          <tr class="even:bg-(--color-foreground)/3">
+            <td class="p-2"><a class="text-blue-500 visited:text-purple-500 hover:underline motion-safe:transition-colors" href="{{ url_for('books.detail', isbn=book.isbn) }}">{{ book.title }}</a></td>
+            <td class="p-2">{{ publication_year_by_isbn[book.isbn] or '—' }}</td>
+            {% if similarity_by_isbn %}
+            <td class="p-2">{{ "%.3f"|format(similarity_by_isbn[book.isbn]) }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% elif query and not (error or search_error) %}
+    <p class="text-(--color-foreground)/50 motion-safe:transition-opacity motion-safe:starting:opacity-0">該当する書籍がありません。</p>
+    {% elif not query %}
+    <p class="text-(--color-foreground)/50 motion-safe:transition-opacity motion-safe:starting:opacity-0">登録された書籍がありません。</p>
+    {% endif %}
+  </div>
+</section>
+<script src="{{ url_for('static', filename='script.js') }}" defer></script>
+{% endblock %}

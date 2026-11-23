@@ -1,0 +1,8 @@
+services:
+  app:
+    build: .
+    command: flask --app src/local_bookshelf/main.py run --host 0.0.0.0 --debug --no-debugger
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - .:/app

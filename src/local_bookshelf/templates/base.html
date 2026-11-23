@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}ローカル書棚{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='book_tate.png') }}" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@latest"></script>
+  </head>
+  <body
+    class="min-h-screen bg-(--color-background) text-(--color-foreground)
+           [--color-background:var(--color-gray-100)] [--color-foreground:var(--color-gray-900)]
+           dark:[--color-background:var(--color-gray-900)] dark:[--color-foreground:var(--color-gray-100)]"
+  >
+    <main class="mx-auto grid max-w-3xl gap-6 p-6">
+      <header>
+        <h1 class="text-lg font-bold">
+          <a href="{{ url_for('books.index') }}">ローカル書棚</a>
+        </h1>
+      </header>
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
